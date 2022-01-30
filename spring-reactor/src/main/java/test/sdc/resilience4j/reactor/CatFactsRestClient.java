@@ -1,5 +1,9 @@
 package test.sdc.resilience4j.reactor;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +23,19 @@ public class CatFactsRestClient {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final WebClient client;
+    private final CircuitBreakerRegistry circuitBreakerRegistry;
+    private final CircuitBreakersConfig circuitBreakerConfig;
 
-    CatFactsRestClient(@Qualifier("catFactsApiClient") WebClient client) {
+    CatFactsRestClient(@Qualifier("catFactsApiClient") WebClient client,
+                       CircuitBreakerRegistry circuitBreakerRegistry,
+                       CircuitBreakersConfig circuitBreakerConfig) {
         this.client = client;
+        this.circuitBreakerRegistry = circuitBreakerRegistry;
+        this.circuitBreakerConfig = circuitBreakerConfig;
     }
 
     public Mono<CatFactDto> getRandomCatFact() {
+        var circuitBreaker = circuitBreaker("random-cat-fact");
         return client.get()
                 .uri(fromUriString("/facts/random")
                         .queryParam("animal_type", "cat")
@@ -38,7 +49,8 @@ public class CatFactsRestClient {
                 .onErrorMap(CodecException.class, CatFactsRestClient::mapResponseFormatMappingError)
                 .onErrorMap(WebClientRequestException.class, CatFactsRestClient::mapRequestError)
                 .doOnError(thr -> log.error("Random cat fact generation failed", thr))
-                .doOnSuccess(dto -> log.info("Received response: {}", dto));
+                .doOnSuccess(dto -> log.info("Received response: {}", dto))
+                .transformDeferred(CircuitBreakerOperator.of(circuitBreaker));
     }
 
     public Flux<CatFactDto> getRandomCatFacts(int amount) {
@@ -75,4 +87,11 @@ public class CatFactsRestClient {
     private static CatFactServiceAccessException mapUnhandledResponseStatus(WebClientResponseException ex) {
         return new CatFactServiceAccessException("Server responded with status " + ex.getRawStatusCode());
     }
+
+    private CircuitBreaker circuitBreaker(String name) {
+        return circuitBreakerRegistry.circuitBreaker(name, circuitBreakerConfig.find(name)
+                .map(CircuitBreakersConfig.CircuitBreakerProperties::toCircuitBreakerConfig)
+                .orElseGet(CircuitBreakerConfig::ofDefaults));
+    }
+
 }

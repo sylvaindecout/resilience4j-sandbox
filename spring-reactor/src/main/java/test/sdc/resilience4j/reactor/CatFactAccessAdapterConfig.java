@@ -1,5 +1,6 @@
 package test.sdc.resilience4j.reactor;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,10 @@ import test.sdc.resilience4j.CatFactAccess;
 
 @Profile("spring-reactor")
 @Configuration
-@EnableConfigurationProperties(WebClientProperties.class)
+@EnableConfigurationProperties({
+        WebClientProperties.class,
+        CircuitBreakersConfig.class
+})
 public class CatFactAccessAdapterConfig {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -24,9 +28,11 @@ public class CatFactAccessAdapterConfig {
     }
 
     @Bean
-    public CatFactsRestClient catFactsRestClient(WebClient client) {
+    public CatFactsRestClient catFactsRestClient(WebClient client,
+                                                 CircuitBreakerRegistry circuitBreakerRegistry,
+                                                 CircuitBreakersConfig circuitBreakersConfig) {
         log.info("Loading client for mode==reactor");
-        return new CatFactsRestClient(client);
+        return new CatFactsRestClient(client, circuitBreakerRegistry, circuitBreakersConfig);
     }
 
     @Bean
