@@ -1,6 +1,8 @@
 package test.sdc.resilience4j.reactor;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import test.sdc.resilience4j.CatFactAccess;
+import test.sdc.resilience4j.CatFactServiceAccessException;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,6 +18,7 @@ public class CatFactAccessAdapter implements CatFactAccess {
     @Override
     public Optional<String> getRandomCatFact() {
         return client.getRandomCatFact()
+                .onErrorMap(CallNotPermittedException.class, CatFactAccessAdapter::mapOpenCircuitError)
                 .map(CatFactDto::text)
                 .blockOptional();
     }
@@ -23,8 +26,12 @@ public class CatFactAccessAdapter implements CatFactAccess {
     @Override
     public Stream<String> getRandomCatFacts(int amount) {
         return client.getRandomCatFacts(amount)
+                .onErrorMap(CallNotPermittedException.class, CatFactAccessAdapter::mapOpenCircuitError)
                 .map(CatFactDto::text)
                 .toStream();
     }
 
+    private static Throwable mapOpenCircuitError( CallNotPermittedException ex) {
+        return new CatFactServiceAccessException("Calls to API are currently suspended");
+    }
 }
