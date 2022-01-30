@@ -1,5 +1,6 @@
 package test.sdc.resilience4j.boot;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.netty.handler.timeout.ReadTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class CatFactsRestClient {
         this.client = client;
     }
 
+    @CircuitBreaker(name = "random-cat-fact")
     public Mono<CatFactDto> getRandomCatFact() {
         return client.get()
                 .uri(fromUriString("/facts/random")
