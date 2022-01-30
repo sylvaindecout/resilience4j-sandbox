@@ -13,6 +13,7 @@ It relies on calls to [Cat Facts API](https://alexwohlbruck.github.io/cat-facts/
 * **bootstrap** is the entry point of the Spring Boot application. It includes the configuration of the application
   in [application.yml](./bootstrap/src/main/resources/application.yml).
 * **common** contains the REST server as well as interfaces that are common to all "client" modules.
+* **basic** uses [Resilience4j core modules](https://resilience4j.readme.io/docs/getting-started).
 * **spring-reactor** uses [Resilience4j with Spring Reactor](https://resilience4j.readme.io/docs/getting-started-1).
 * **spring-boot-2** uses
   [Resilience4j with Spring Boot 2 specifics](https://resilience4j.readme.io/docs/getting-started-3).
@@ -21,6 +22,7 @@ It relies on calls to [Cat Facts API](https://alexwohlbruck.github.io/cat-facts/
 
 Start application with one of the following profiles depending on the implementation of the REST client you want to use:
 
+* basic
 * spring-reactor
 * spring-boot-2
 

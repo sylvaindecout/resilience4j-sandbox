@@ -33,6 +33,7 @@
 
     <modules>
         <module>common</module>
+        <module>basic</module>
         <module>spring-reactor</module>
         <module>spring-boot-2</module>
         <module>bootstrap</module>
