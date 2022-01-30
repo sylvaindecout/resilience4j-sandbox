@@ -25,3 +25,10 @@ Start application with one of the following profiles depending on the implementa
 * spring-boot-2
 
 Call `http://localhost:8080/random` from your browser. A random cat fact is expected to be displayed.
+
+Call `http://localhost:8080/actuator/` to access Actuator endpoints. For instance:
+
+* `http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.calls`
+* `http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.state`
+* `http://localhost:8080/actuator/metrics/resilience4j.circuitbreaker.failure.rate`
+

@@ -4,6 +4,12 @@ cat-facts:
     connection-time-out-millis: 2_000
     read-time-out-millis: 2_000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 resilience4j:
   circuitbreaker:
     instances:
