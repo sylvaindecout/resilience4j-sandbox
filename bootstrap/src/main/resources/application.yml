@@ -1,0 +1,5 @@
+cat-facts:
+  api:
+    base-url: https://cat-fact.herokuapp.com
+    connection-time-out-millis: 2_000
+    read-time-out-millis: 2_000
