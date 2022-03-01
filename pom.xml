@@ -28,7 +28,7 @@
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.3.1</mockito.version>
         <assertj.version>3.22.0</assertj.version>
-        <archunit.version>0.22.0</archunit.version>
+        <archunit.version>0.23.1</archunit.version>
     </properties>
 
     <modules>
